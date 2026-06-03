@@ -6,7 +6,7 @@ ARCH=x86_64
 
 git clone --depth 1 \
     --branch ${ALPINE_VERSION} \
-    https://gitlab.alpinelinux.org/alpine/aports.git
+    https://github.com/alpinelinux/aports.git
 
 cp profiles/mkimg.myappliance.sh \
     aports/scripts/
