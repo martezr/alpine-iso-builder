@@ -1,0 +1,16 @@
+pkgname=demo
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="Company appliance configuration"
+arch="all"
+license="MIT"
+
+source="rootfs.tar.gz"
+
+build() {
+    :
+}
+
+package() {
+    cp -a rootfs/* "$pkgdir"/
+}

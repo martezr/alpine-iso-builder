@@ -1,0 +1,9 @@
+#!/sbin/openrc-run
+
+name="myservice"
+
+command="/usr/local/bin/myservice"
+
+depend() {
+    need net
+}
