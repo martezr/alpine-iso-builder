@@ -18,7 +18,7 @@ git clone --depth 1 \
 
 #cp scripts/mkimage.myappliance.sh aports/scripts/
 
-ls -alh
+ls -alh scripts/
 
 cd aports
 
@@ -26,4 +26,4 @@ cd aports
 MKIMG_PROFILE_DIR=../scripts ./scripts/mkimage.sh \
   -t "$ALPINE_VERSION" \
   -a "$ARCH" \
-  myappliance
+  --profile myappliance
