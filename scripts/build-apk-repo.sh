@@ -13,6 +13,9 @@ apk add --no-cache alpine-sdk abuild
 # Create build user (important fix for your earlier errors)
 adduser -D builder
 addgroup builder abuild
+if [ -d "$APKBUILD_DIR" ]; then
+  chown -R builder:builder "$APKBUILD_DIR"
+fi
 chown -R builder:builder "$APKBUILD_DIR"
 
 # Init abuild environment (no doas, no root install issues)
