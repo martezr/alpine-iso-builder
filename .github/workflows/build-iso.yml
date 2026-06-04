@@ -28,10 +28,25 @@ jobs:
             git \
             bash
 
+      - name: Create build user
+        run: |
+          adduser -D builder
+          addgroup builder abuild
+
+          mkdir -p /home/builder/.abuild
+
+          chown -R builder:builder \
+            /home/builder \
+            "$GITHUB_WORKSPACE"
+
+      - name: Generate abuild key
+        run: |
+          su builder -c "abuild-keygen -a -n -i"
+
       - name: Build ISO
         run: |
           chmod +x scripts/build-iso.sh
-          ./scripts/build-iso.sh
+          su builder -c "cd $GITHUB_WORKSPACE && ./scripts/build-iso.sh"
 
       - name: Upload ISO
         uses: actions/upload-artifact@v4

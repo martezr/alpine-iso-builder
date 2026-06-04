@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -euxo pipefail
+
+trap 'echo "FAILED AT LINE $LINENO"' ERR
 
 ###############################################################################
 # Configuration
