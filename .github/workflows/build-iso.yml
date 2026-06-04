@@ -72,6 +72,9 @@ jobs:
       # ------------------------------------------------------------
       - name: Build APK packages
         run: |
+          # CRITICAL: fix ownership BEFORE build
+          chown -R builder:builder "$GITHUB_WORKSPACE"
+
           su builder -c '
             for dir in $(find packages -name APKBUILD -exec dirname {} \;); do
               cd "$GITHUB_WORKSPACE/$dir" && abuild -r
