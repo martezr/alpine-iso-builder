@@ -1,9 +1,8 @@
-name: Build Alpine ISO
+name: Alpine Appliance Build
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -14,45 +13,79 @@ jobs:
       image: alpine:3.23
 
     steps:
-      - uses: actions/checkout@v4
+      # ------------------------------------------------------------
+      # Checkout repo
+      # ------------------------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      # ------------------------------------------------------------
+      # Install build dependencies
+      # ------------------------------------------------------------
       - name: Install dependencies
         run: |
           apk add --no-cache \
             alpine-sdk \
             abuild \
-            bash \
             git \
+            bash \
             xorriso \
             squashfs-tools \
             syslinux \
             mkinitfs
 
-      - name: Build APK repository
+      # ------------------------------------------------------------
+      # Clone aports (required for mkimage)
+      # ------------------------------------------------------------
+      - name: Clone aports
         run: |
-          chmod +x scripts/build-apk-repo.sh
-          ./scripts/build-apk-repo.sh
+          git clone --depth 1 \
+            --branch 3.23-stable \
+            https://github.com/alpinelinux/aports.git \
+            "$GITHUB_WORKSPACE/aports"
 
-      - name: Build ISO
+      # ------------------------------------------------------------
+      # Create non-root builder user (required by mkimage/abuild)
+      # ------------------------------------------------------------
+      - name: Setup builder user
         run: |
-          # Create user if missing (idempotent)
           id builder &>/dev/null || adduser -D builder
-
           addgroup builder abuild || true
 
-          # Fix ownership of workspace
           chown -R builder:builder "$GITHUB_WORKSPACE"
 
+      # ------------------------------------------------------------
+      # Build custom APKs (from your repo, not aports-local)
+      # ------------------------------------------------------------
+      - name: Build APK packages
+        run: |
           su builder -c '
-          cd aports && ./scripts/mkimage.sh \
-            --tag v3.23 \
-            --arch x86_64 \
-            --profile myappliance \
-            --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/main \
-            --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/community
+            for dir in $(find packages -name APKBUILD -exec dirname {} \;); do
+              cd "$GITHUB_WORKSPACE/$dir" && abuild -r
+            done
           '
+
+      # ------------------------------------------------------------
+      # Build ISO using mkimage
+      # ------------------------------------------------------------
+      - name: Build ISO
+        run: |
+          APORTS_DIR="$GITHUB_WORKSPACE/aports"
+
+          su builder -c "
+            $APORTS_DIR/scripts/mkimage.sh \
+              --tag v3.23 \
+              --arch x86_64 \
+              --profile myappliance \
+              --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/main \
+              --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/community
+          "
+
+      # ------------------------------------------------------------
+      # Upload artifact
+      # ------------------------------------------------------------
       - name: Upload ISO
         uses: actions/upload-artifact@v4
         with:
           name: alpine-appliance
-          path: aports/packages/*.iso
+          path: aports/packages/**/*.iso
