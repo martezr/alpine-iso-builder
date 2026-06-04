@@ -89,7 +89,10 @@ jobs:
           APORTS_DIR="$GITHUB_WORKSPACE/aports"
 
           su builder -c "
-            $APORTS_DIR/scripts/mkimage.sh \
+            cd $APORTS_DIR && \
+            . ./scripts/functions.sh && \
+            . ./scripts/mkimage-functions.sh && \
+            ./scripts/mkimage.sh \
               --tag v3.23 \
               --arch x86_64 \
               --profile standard \
