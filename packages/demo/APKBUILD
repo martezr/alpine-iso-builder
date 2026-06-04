@@ -1,16 +1,14 @@
 pkgname=demo
 pkgver=1.0.0
 pkgrel=0
-pkgdesc="Company appliance configuration"
+pkgdesc="Demo package"
+url="https://example.com"
 arch="all"
 license="MIT"
 
-source="rootfs.tar.gz"
-
-build() {
-    :
-}
+options="!check"
 
 package() {
-    cp -a rootfs/* "$pkgdir"/
+  mkdir -p "$pkgdir/usr/share/demo"
+  echo "hello" > "$pkgdir/usr/share/demo/hello.txt"
 }
