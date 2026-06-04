@@ -1,78 +1,27 @@
 #!/usr/bin/env bash
-
 set -euxo pipefail
 
-trap 'echo "FAILED AT LINE $LINENO"' ERR
+ALPINE_VERSION=v3.23
+ARCH=x86_64
 
-###############################################################################
-# Configuration
-###############################################################################
+apk add --no-cache \
+  alpine-sdk \
+  abuild \
+  xorriso \
+  squashfs-tools \
+  syslinux \
+  mkinitfs
 
-ALPINE_MAJOR_MINOR="3.23"
-ALPINE_TAG="v3.23"
-ARCH="x86_64"
+git clone --depth 1 \
+  --branch 3.23-stable \
+  https://github.com/alpinelinux/aports.git
 
-WORKDIR="$(pwd)"
-APORTS_DIR="${WORKDIR}/aports"
-OUTPUT_DIR="${WORKDIR}/output"
+cp scripts/mkimage.myappliance.sh aports/scripts/
 
-###############################################################################
-# Cleanup previous build artifacts
-###############################################################################
+cd aports
 
-rm -rf "${APORTS_DIR}"
-mkdir -p "${OUTPUT_DIR}"
-
-###############################################################################
-# Clone matching Alpine aports branch
-###############################################################################
-
-git clone \
-  --depth 1 \
-  --branch "${ALPINE_MAJOR_MINOR}-stable" \
-  https://github.com/alpinelinux/aports.git \
-  "${APORTS_DIR}"
-
-###############################################################################
-# Copy custom mkimage profile
-###############################################################################
-
-cp \
-  "${WORKDIR}/profiles/mkimg.myappliance.sh" \
-  "${APORTS_DIR}/scripts/"
-
-###############################################################################
-# Optional: Copy custom apkovl generator
-###############################################################################
-
-if [[ -f "${WORKDIR}/overlays/genapkovl-myappliance.sh" ]]; then
-  cp \
-    "${WORKDIR}/overlays/genapkovl-myappliance.sh" \
-    "${APORTS_DIR}/scripts/"
-fi
-
-###############################################################################
-# Build ISO
-###############################################################################
-
-cd "${APORTS_DIR}"
-
+# IMPORTANT: run via profile name (not --profile)
 ./scripts/mkimage.sh \
-  --tag "${ALPINE_TAG}" \
-  --arch "${ARCH}" \
-  --profile myappliance \
-  --outdir "${OUTPUT_DIR}" \
-  --repository "https://dl-cdn.alpinelinux.org/alpine/${ALPINE_TAG}/main" \
-  --repository "https://dl-cdn.alpinelinux.org/alpine/${ALPINE_TAG}/community"
-
-###############################################################################
-# Results
-###############################################################################
-
-echo
-echo "ISO build complete."
-echo "Output directory:"
-echo "  ${OUTPUT_DIR}"
-echo
-
-find "${OUTPUT_DIR}" -type f -name "*.iso"
+  -t "$ALPINE_VERSION" \
+  -a "$ARCH" \
+  myappliance

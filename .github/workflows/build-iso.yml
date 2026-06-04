@@ -1,12 +1,3 @@
-name: Build Alpine ISO
-
-on:
-  push:
-    branches:
-      - main
-
-  workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,43 +8,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install build tools
+      - name: Install dependencies
         run: |
           apk add --no-cache \
             alpine-sdk \
-            apk-tools \
-            squashfs-tools \
-            xorriso \
-            syslinux \
+            abuild \
+            bash \
             git \
-            bash
+            xorriso \
+            squashfs-tools \
+            syslinux \
+            mkinitfs
 
-      - name: Create build user
+      - name: Build APK repository
         run: |
-          adduser -D builder
-          addgroup builder abuild
-
-          mkdir -p /home/builder/.abuild
-
-          chown -R builder:builder \
-            /home/builder \
-            "$GITHUB_WORKSPACE"
-
-      - name: Generate abuild key
-        run: |
-          su builder -c "abuild-keygen -a -n"
-
-      - name: Install abuild public key
-        run: |
-          cp /home/builder/.abuild/*.rsa.pub /etc/apk/keys/
+          chmod +x scripts/build-apk-repo.sh
+          ./scripts/build-apk-repo.sh
 
       - name: Build ISO
         run: |
           chmod +x scripts/build-iso.sh
-          su builder -c "cd $GITHUB_WORKSPACE && ./scripts/build-iso.sh"
+          ./scripts/build-iso.sh
 
       - name: Upload ISO
         uses: actions/upload-artifact@v4
         with:
-          name: alpine-custom-iso
-          path: output/*.iso
+          name: alpine-appliance
+          path: aports/packages/*.iso
