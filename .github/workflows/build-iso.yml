@@ -92,7 +92,7 @@ jobs:
             $APORTS_DIR/scripts/mkimage.sh \
               --tag v3.23 \
               --arch x86_64 \
-              --profile myappliance \
+              --profile standard \
               --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/main \
               --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/community
           "
