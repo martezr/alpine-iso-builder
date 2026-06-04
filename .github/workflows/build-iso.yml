@@ -47,13 +47,19 @@ jobs:
       # ------------------------------------------------------------
       # Create non-root builder user (required by mkimage/abuild)
       # ------------------------------------------------------------
-      - name: Setup builder user
+      - name: Setup abuild key
         run: |
           id builder &>/dev/null || adduser -D builder
           addgroup builder abuild || true
 
-          chown -R builder:builder "$GITHUB_WORKSPACE"
+          chown -R builder:builder /home/builder 2>/dev/null || true
 
+          su builder -c "abuild-keygen -a"
+
+          su builder -c '
+            KEY=$(ls /home/builder/.abuild/*.rsa | head -n 1)
+            echo "PACKAGER_PRIVKEY=$KEY" >> /home/builder/.abuild/abuild.conf
+          '
       # ------------------------------------------------------------
       # Build custom APKs (from your repo, not aports-local)
       # ------------------------------------------------------------
