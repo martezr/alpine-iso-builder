@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
-APKBUILD_DIR="$(pwd)/aports-local"
+APKBUILD_DIR="$(pwd)/packages"
 REPO_DIR="$(pwd)/repo/packages"
 KEY_DIR="$(pwd)/keys"
 
@@ -23,10 +23,14 @@ cp /home/builder/.abuild/*.rsa.pub /etc/apk/keys/
 cp /home/builder/.abuild/*.rsa.pub "$KEY_DIR/"
 
 # Build all custom APKs
-for dir in "$APKBUILD_DIR"/*; do
-  [ -d "$dir" ] || continue
+for apkbuild in "$APKBUILD_DIR"/*/APKBUILD; do
+  [ -f "$apkbuild" ] || continue
 
-  su builder -c "cd $dir && abuild -r"
+  dir="$(dirname "$apkbuild")"
+
+  echo "Building APKBUILD in $dir"
+
+  su builder -c "cd '$dir' && abuild -r"
 done
 
 # Copy packages into repo
