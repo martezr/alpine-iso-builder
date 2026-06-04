@@ -24,8 +24,8 @@ cd aports
 
 # IMPORTANT: run via profile name (not --profile)
 ./scripts/mkimage.sh \
-  -t "$ALPINE_VERSION" \
-  -a "$ARCH" \
+  --tag "$ALPINE_VERSION" \
+  --arch "$ARCH" \
   --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/main \
   --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/community \
-  --profile base
+  --profile myappliance
