@@ -32,7 +32,8 @@ jobs:
             xorriso \
             squashfs-tools \
             syslinux \
-            mkinitfs
+            mkinitfs \
+            doas
 
       # ------------------------------------------------------------
       # Clone aports (required for mkimage)
