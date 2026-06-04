@@ -16,7 +16,9 @@ git clone --depth 1 \
   --branch 3.23-stable \
   https://github.com/alpinelinux/aports.git
 
-cp scripts/mkimage.myappliance.sh aports/scripts/
+#cp scripts/mkimage.myappliance.sh aports/scripts/
+
+ls -alh
 
 cd aports
 
