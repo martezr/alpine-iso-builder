@@ -54,7 +54,7 @@ jobs:
 
           chown -R builder:builder /home/builder 2>/dev/null || true
 
-          su builder -c "abuild-keygen -a"
+          su builder -c "abuild-keygen -a -n -i"
 
           su builder -c '
             KEY=$(ls /home/builder/.abuild/*.rsa | head -n 1)
