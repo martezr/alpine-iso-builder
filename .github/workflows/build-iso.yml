@@ -48,15 +48,21 @@ jobs:
       # ------------------------------------------------------------
       # Create non-root builder user (required by mkimage/abuild)
       # ------------------------------------------------------------
-      - name: Setup abuild key
+      - name: Setup abuild key (CI safe)
         run: |
           id builder &>/dev/null || adduser -D builder
           addgroup builder abuild || true
 
+          mkdir -p /etc/apk/keys
           chown -R builder:builder /home/builder 2>/dev/null || true
 
-          su builder -c "abuild-keygen -a -n -i"
+          # Generate key WITHOUT -a (critical fix)
+          su builder -c "abuild-keygen -n -P ''"
 
+          # Install key manually (no doas involved)
+          cp /home/builder/.abuild/*.rsa.pub /etc/apk/keys/
+
+          # Configure abuild to use private key
           su builder -c '
             KEY=$(ls /home/builder/.abuild/*.rsa | head -n 1)
             echo "PACKAGER_PRIVKEY=$KEY" >> /home/builder/.abuild/abuild.conf
