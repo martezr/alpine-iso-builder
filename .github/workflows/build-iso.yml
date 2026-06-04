@@ -35,17 +35,21 @@ jobs:
 
       - name: Build ISO
         run: |
-          adduser -D builder
-          addgroup builder abuild
-          chown -R builder:builder .
+          # Create user if missing (idempotent)
+          id builder &>/dev/null || adduser -D builder
+
+          addgroup builder abuild || true
+
+          # Fix ownership of workspace
+          chown -R builder:builder "$GITHUB_WORKSPACE"
 
           su builder -c '
-            cd aports && ./scripts/mkimage.sh \
-              --tag v3.23 \
-              --arch x86_64 \
-              --profile myappliance \
-              --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/main \
-              --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/community
+          cd aports && ./scripts/mkimage.sh \
+            --tag v3.23 \
+            --arch x86_64 \
+            --profile myappliance \
+            --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/main \
+            --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/community
           '
       - name: Upload ISO
         uses: actions/upload-artifact@v4
