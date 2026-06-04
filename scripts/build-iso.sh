@@ -26,4 +26,6 @@ cd aports
 ./scripts/mkimage.sh \
   -t "$ALPINE_VERSION" \
   -a "$ARCH" \
-  --profile myappliance
+  --profile myappliance \
+  --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/main \
+  --repository https://dl-cdn.alpinelinux.org/alpine/v3.23/community
