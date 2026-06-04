@@ -21,7 +21,7 @@ cp scripts/mkimage.myappliance.sh aports/scripts/
 cd aports
 
 # IMPORTANT: run via profile name (not --profile)
-./scripts/mkimage.sh \
+MKIMG_PROFILE_DIR=../scripts ./scripts/mkimage.sh \
   -t "$ALPINE_VERSION" \
   -a "$ARCH" \
   myappliance
