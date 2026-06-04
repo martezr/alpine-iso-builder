@@ -57,7 +57,7 @@ jobs:
           chown -R builder:builder /home/builder 2>/dev/null || true
 
           # Generate key WITHOUT -a (critical fix)
-          su builder -c "abuild-keygen -n -P ''"
+          su builder -c "abuild-keygen -n"
 
           # Install key manually (no doas involved)
           cp /home/builder/.abuild/*.rsa.pub /etc/apk/keys/
