@@ -41,7 +41,11 @@ jobs:
 
       - name: Generate abuild key
         run: |
-          su builder -c "abuild-keygen -a -n -i"
+          su builder -c "abuild-keygen -a -n"
+
+      - name: Install abuild public key
+        run: |
+          cp /home/builder/.abuild/*.rsa.pub /etc/apk/keys/
 
       - name: Build ISO
         run: |
